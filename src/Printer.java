@@ -25,7 +25,7 @@ public class Printer {
         out.println();
         out.println("=====================================================================================");
         out.println("PRODUTOS");
-        out.println("\tProduct\t\t\t\tPreço Unitário\t\tStore");
+        out.println("\tProduct\t\t\t\tPreço Unitário\t\tstore.store");
         List listExistTypes = Arrays.asList(mapProducts.keySet().toArray());
         listExistTypes = (List) listExistTypes.stream().sorted().collect(Collectors.toList());
         for (int i = 0; i < listExistTypes.size(); i++) {

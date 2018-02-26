@@ -1,12 +1,12 @@
 public class OrderItem {
 
-    private final ProductType productType;
+
+
     private final Product product;
     private int qtt;
 
     public OrderItem(Product product, int qtt) {
         this.product = product;
-        this.productType = product.getProductType();
         this.qtt = qtt;
     }
 
@@ -42,9 +42,9 @@ public class OrderItem {
         return qtt * product.getPrice();
     }
 
-    public Product getProduct() {
+    /*public Product getProduct() {
         return new Product(productType, getProdName(), getProdPrice());
-    }
+    }*/
 
     public boolean equals(OrderItem orderItem) {
         return this.product.getName().equalsIgnoreCase(orderItem.getProductName());

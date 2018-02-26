@@ -1,75 +1,62 @@
+
 import java.util.*;
 
 public class Store {
-    private Map<ProductType, List<Product>> store;
 
+    private List<ProductHolder> productHolderList;
 
     public Store(){
-        store = new HashMap<>();
+        productHolderList = new LinkedList<>();
         generateInitialProducts();
     }
 
     private void generateInitialProducts() {
-        List<Product> productList = new LinkedList<>();
-        productList.add(new Product(ProductType.MESA_REDONDA, "mesa redonda", 300));
-        productList.add(new Product(ProductType.MESA_RETANGULAR, "mesa retangular", 400));
-        productList.add(new Product(ProductType.ROUPA_BRANCA, "camiseta branca", 20));
-        productList.add(new Product(ProductType.ROUPA_PRETA, "camiseta preta", 25));
-        for (Product product : productList) {
-            for (int i = 0; i < 20; i++) {
-                increaseProduct(product);
-            }
+        for (int i = 0; i < 20; i++) {
+            registerProduct("001", "Mesa redonda", 300, 20);
+            registerProduct("002", "Mesa retangular", 400, 20);
+            registerProduct("001", "Camiseta branca", 20, 20);
+            registerProduct("002", "Camiseta preta", 25, 20);
         }
     }
 
-    private void increaseProduct(Product product) {
-        ProductType productType = product.getProductType();
-        List<Product> list = store.get(productType);
-        if (list == null) {
-            list = new LinkedList<>();
-        }
-        list.add(product);
-        store.put(productType, list);
+    private void registerProduct(String serialNumber, String name, float price, int qtt) {
+        Product product = new Product(serialNumber, name, price);
+        ProductHolder holder = new ProductHolder(product, qtt);
+        productHolderList.add(holder);
     }
 
-    private int getProductStock(Product product) {
-        List<Product> list = store.get(product.getProductType());
-        return list.size();
+    private int getProductQtt(Product product) {
+        ProductHolder holder = getProductHolder(product);
+        return holder.getQtt();
     }
 
     public void decreaseProduct(Product product, int qtt) {
-        ProductType productType = product.getProductType();
-
-        List<Product> list = store.get(productType);
-
-        for (int i = 0; i < qtt; i++) {
-            list.remove(0);
-        }
-        store.put(productType, list);
-
+        ProductHolder holder = getProductHolder(product);
+        holder.decreaseQtt(qtt);
     }
 
-    public Map getProducts() {
-        return Collections.unmodifiableMap(store);
+    private ProductHolder getProductHolder(Product product) {
+        Optional<ProductHolder> productHolderOpt = productHolderList.stream()
+                .filter(productHolder -> productHolder.equals(product.getSerialNumber())).findFirst();
+        return productHolderOpt.orElseThrow(() -> new RuntimeException()); // ProductNotFound  nao existe o produto pesquisado
     }
 
-    public Product getProductByNome(String productName) {
-        List listExistTypes = Arrays.asList(store.keySet().toArray());
-        for (int i = 0; i < listExistTypes.size(); i++) {
-            ProductType productType = (ProductType)listExistTypes.get(i);
-            List listProd = store.get(productType);
-            for (int j = 0; j < listProd.size(); j++) {
-                Product product = (Product) listProd.get(j);
-                if (product.getName().equalsIgnoreCase(productName)) {
-                    return product;
-                }
-            }
+    public List getProducts() {
+        return Collections.unmodifiableList(productHolderList);
+    }
+
+    public Product getProductByProductName(String productName) {
+        Optional<ProductHolder> holderOpt = productHolderList.stream().filter(productHolder -> productHolder.getProduct().equals(productName)).findFirst();
+        if (holderOpt.isPresent()) {
+            return holderOpt.get().getProduct();
+        } else {
+            throw new RuntimeException(); // ProductNotFound
         }
-        return null;
+
     }
 
     public boolean hasProdEnough(Product product, int qttRequest) {
-        return getProductStock(product) >= qttRequest;
+        return getProductQtt(product) >= qttRequest;
     }
 
 
