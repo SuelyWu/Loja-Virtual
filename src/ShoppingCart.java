@@ -1,69 +1,61 @@
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShoppingCart {
 
-    private List<OrderItem> items = new LinkedList<>();
+    private List<AdjustableProductHolder> items = new LinkedList<>();
 
-    public void adjustItemQtt(Product product, int newQtt) {
-        OrderItem orderItem = new OrderItem(product, newQtt);
-        List<OrderItem> matchedItems = items.stream().filter(item -> item.equals(orderItem)).collect(Collectors.toList());
-        OrderItem oldItem = matchedItems.get(0);
-        if (oldItem.getQtt() < newQtt) {
-            addItem(product, newQtt - oldItem.getQtt());
+    private AdjustableProductHolder getAdjustableProductHolder(Product product) {
+        Optional<AdjustableProductHolder> adjustableProductHolder = items.stream()
+                .filter(productHolder -> productHolder.equals(product.getSerialNumber())).findFirst();
+        return adjustableProductHolder.orElseThrow(() -> new RuntimeException("ProductNotFoundException")); // ProductNotFoundException
+    }
+
+    public void adjustItemQtt(Product product, int newQtt, Store store) {
+        AdjustableProductHolder holder = getAdjustableProductHolder(product);
+        int oldQtt = holder.getQtt();
+        if (newQtt < oldQtt) {
+            decreaseItem(product, oldQtt-newQtt);
         } else {
-            delItem(product, oldItem.getQtt() - newQtt);
+            increaseItem(product, newQtt-oldQtt, store);
         }
     }
 
-    public void addItem(Product product, int qtt) {
-        OrderItem itemAdd = new OrderItem(product, qtt);
-        List<OrderItem> matchedItems = items.stream().filter(item -> item.equals(itemAdd)).collect(Collectors.toList());
-        if (matchedItems.isEmpty()) {
-            items.add(itemAdd);
-        } else {
-            OrderItem orderItem = matchedItems.get(0);
-            items.remove(orderItem);
-            orderItem.increaseQtt(qtt);
-            items.add(orderItem);
+    public void increaseItem(Product product, int qtt, Store store) {
+        AdjustableProductHolder holder = getAdjustableProductHolder(product);
+        if (store.hasProdEnough(product, holder.getQtt()+qtt)) {
+            holder.increaseQtt(qtt);
         }
+        throw new RuntimeException("ProductNotEnoughException"); // product insuficiente
     }
 
-    private boolean delItem(Product product, int qtt) {
-        OrderItem itemDel = new OrderItem(product, qtt);
-        List<OrderItem> matchedItems = items.stream().filter(item -> item.equals(itemDel)).collect(Collectors.toList());
-        if (!matchedItems.isEmpty()) {
-            OrderItem orderItem = matchedItems.get(0);
-            OrderItem orderItem1 = orderItem;
-            items.remove(orderItem);
-            if (!orderItem.decreaseQtt(qtt)) {
-                items.add(orderItem1);
-                return false;
-            }
-            items.add(orderItem);
-            return true;
+    private void decreaseItem(Product product, int qtt) {
+        AdjustableProductHolder holder = getAdjustableProductHolder(product);
+        if (holder.getQtt()-qtt > 0) {
+            holder.decreaseQtt(qtt);
+        } else if (holder.getQtt()-qtt == 0) {
+            this.items.remove(holder);
+        } else {
+            throw new IllegalArgumentException("Produto não deve ter valor negativo"); // qtt solicitado eh negativo
         }
-        return false;
     }
 
     public List getItems() {
         return Collections.unmodifiableList(items);
     }
 
-    public Product getProdItemsByNome(String productNome) {
-        List matchedItem = items.stream().filter(item -> item.getProdName().equalsIgnoreCase(productNome)).collect(Collectors.toList());
-        if (matchedItem.isEmpty()) {
-            return null;
-        }
-        OrderItem orderItem = (OrderItem) matchedItem.get(0);
-        return orderItem.getProduct();
+    public Product getProdByName(String productNome) {
+        AdjustableProductHolder holder = this.items.stream()
+                .filter(productHolder -> productHolder.getProductName().equalsIgnoreCase(productNome)).findFirst().orElseThrow(() -> new RuntimeException("ProductNotFoundException"));
+        return holder.getProduct();
     }
 
-    public double getCartTotal() {
+    public double getShoppingCartTotal() {
          double total = 0;
-         for (OrderItem item : items) {
+         for (AdjustableProductHolder item : items) {
              total += item.getSubtotal();
          }
          return total;

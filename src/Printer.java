@@ -21,19 +21,15 @@ public class Printer {
         out.println(obj);
     }
 
-    public void printProducts(Map mapProducts) {
+    public void printProducts(List storeList) {
         out.println();
         out.println("=====================================================================================");
         out.println("PRODUTOS");
-        out.println("\tProduct\t\t\t\tPreço Unitário\t\tstore.store");
-        List listExistTypes = Arrays.asList(mapProducts.keySet().toArray());
-        listExistTypes = (List) listExistTypes.stream().sorted().collect(Collectors.toList());
-        for (int i = 0; i < listExistTypes.size(); i++) {
-            ProductType productType = (ProductType)listExistTypes.get(i);
-            List listProd = (List)mapProducts.get(productType);
-            Product product = (Product)listProd.get(i);
-            out.println(String.format("\t%s\t\tR$ %.2f\t\t\t%d", product.getName(), product.getPrice(), listProd.size()));
-        }
+        out.println("\tProduct\t\t\t\tPreço Unitário\t\tEstoque");
+        storeList.forEach(o -> out.println(String.format("\t%s\t\tR$ %.2f\t\t\t%d",
+                        ((AdjustableProductHolder)o).getProductName(),
+                        ((AdjustableProductHolder)o).getProductPrice(),
+                        ((AdjustableProductHolder)o).getQtt())));
         out.println();
     }
 
@@ -43,27 +39,26 @@ public class Printer {
         out.println("Carrinho de Compras:");
 
         if (listItems.isEmpty()){
-            out.println("Seu carrinho está vazio!");
+            out.println("Seu carrinho está vazio!\n");
             return;
         }
 
         out.println("\tProduct\t\t\t\tPreço Unitário\t\tQuantidade\t\tSubtotal");
         double total = 0;
-        for (int i = 0; i < listItems.size(); i++){
-            OrderItem orderItem = (OrderItem) listItems.get(i);
-            total += orderItem.getSubtotal();
-            out.println(String.format("\t%s\t\tR$ %.2f\t\t\t%d\t\t\t\tR$ %.2f",
-                    orderItem.getProdName(), orderItem.getProdPrice(), orderItem.getQtt(), orderItem.getSubtotal()));
-        }
+        listItems.forEach(o -> out.println(String.format("\t%s\t\tR$ %.2f\t\t\t%d\t\t\t\tR$ %.2f",
+                ((AdjustableProductHolder)o).getProductName(),
+                ((AdjustableProductHolder)o).getProductPrice(),
+                ((AdjustableProductHolder)o).getQtt(),
+                ((AdjustableProductHolder)o).getSubtotal())));
         out.println(String.format("\t\t\t\t\t\t\t\t\t\t\tTotal:\t\t\tR$ %.2f", total));
         out.println();
     }
 
     public void printBilletBarCode(List listBarCode) {
-        out.println("Código de barras:");
+        out.println("Código de barras: ");
         for (int i = 0; i < listBarCode.size(); i++) {
-            String parteAtual = String.valueOf(listBarCode.get(i));
-            out.print(parteAtual + " ");
+            String actualPart = String.valueOf(listBarCode.get(i));
+            out.print(actualPart + " ");
         }
         out.println();
     }

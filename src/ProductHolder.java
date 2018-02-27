@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.List;
-
 public class ProductHolder {
 
     private final Product product;
@@ -11,23 +8,28 @@ public class ProductHolder {
         this.qtt = qtt;
     }
 
-    public void increaseQtt(int qtt) {
-        this.qtt += qtt;
-    }
-
-    public void decreaseQtt(int qtt) {
-        if (this.qtt - qtt < 0) {
-            throw new RuntimeException(); // ProductStoreNotEnoughException
-        }
-        this.qtt -= qtt;
-    }
-
     public int getQtt() {
         return this.qtt;
     }
 
+    protected void setQtt(int newQtt) {
+        this.qtt = newQtt;
+    }
+
     public Product getProduct() {
         return product;
+    }
+
+    public String getProductName() {
+        return product.getName();
+    }
+
+    public float getProductPrice() {
+        return product.getPrice();
+    }
+
+    public float getSubtotal() {
+        return product.getPrice() * qtt;
     }
 
     @Override

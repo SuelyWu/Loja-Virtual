@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Store {
 
-    private List<ProductHolder> productHolderList;
+    private List<AdjustableProductHolder> productHolderList;
 
     public Store(){
         productHolderList = new LinkedList<>();
@@ -11,34 +11,32 @@ public class Store {
     }
 
     private void generateInitialProducts() {
-        for (int i = 0; i < 20; i++) {
-            registerProduct("001", "Mesa redonda", 300, 20);
-            registerProduct("002", "Mesa retangular", 400, 20);
-            registerProduct("001", "Camiseta branca", 20, 20);
-            registerProduct("002", "Camiseta preta", 25, 20);
-        }
+        registerProduct("MESA001", "Mesa redonda", 300, 20);
+        registerProduct("MESA002", "Mesa retangular", 400, 20);
+        registerProduct("ROUPA001", "Camiseta branca", 20, 20);
+        registerProduct("ROUPA002", "Camiseta preta", 25, 20);
     }
 
     private void registerProduct(String serialNumber, String name, float price, int qtt) {
         Product product = new Product(serialNumber, name, price);
-        ProductHolder holder = new ProductHolder(product, qtt);
+        AdjustableProductHolder holder = new AdjustableProductHolder(product, qtt);
         productHolderList.add(holder);
     }
 
     private int getProductQtt(Product product) {
-        ProductHolder holder = getProductHolder(product);
+        AdjustableProductHolder holder = getAdjustableProductHolder(product);
         return holder.getQtt();
     }
 
     public void decreaseProduct(Product product, int qtt) {
-        ProductHolder holder = getProductHolder(product);
+        AdjustableProductHolder holder = getAdjustableProductHolder(product);
         holder.decreaseQtt(qtt);
     }
 
-    private ProductHolder getProductHolder(Product product) {
-        Optional<ProductHolder> productHolderOpt = productHolderList.stream()
+    private AdjustableProductHolder getAdjustableProductHolder(Product product) {
+        Optional<AdjustableProductHolder> adjustableProductHolder = productHolderList.stream()
                 .filter(productHolder -> productHolder.equals(product.getSerialNumber())).findFirst();
-        return productHolderOpt.orElseThrow(() -> new RuntimeException()); // ProductNotFound  nao existe o produto pesquisado
+        return adjustableProductHolder.orElseThrow(() -> new RuntimeException()); // ProductNotFound  nao existe o produto pesquisado
     }
 
     public List getProducts() {
@@ -46,7 +44,7 @@ public class Store {
     }
 
     public Product getProductByProductName(String productName) {
-        Optional<ProductHolder> holderOpt = productHolderList.stream().filter(productHolder -> productHolder.getProduct().equals(productName)).findFirst();
+        Optional<AdjustableProductHolder> holderOpt = productHolderList.stream().filter(productHolder -> productHolder.getProduct().equals(productName)).findFirst();
         if (holderOpt.isPresent()) {
             return holderOpt.get().getProduct();
         } else {

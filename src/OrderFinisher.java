@@ -1,9 +1,3 @@
-import payment.PaymentBillet;
-import payment.PaymentCreditCard;
-import payment.PaymentOption;
-import payment.PaymentOptionType;
-import store.Store;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +16,15 @@ public class OrderFinisher {
         this.store = store;
     }
 
-    public Order finish(Map args) {
+    public Order finalizeOrder(Map args) {
         treatArgs(args);
         PaymentOption paymentOption = getPayment();
         Order order = new Order(client, shoppingCart.getItems(), paymentOption);
         client.addOrder(order);
         List items = shoppingCart.getItems();
         for (Object obj : items) {
-            Product product = ((OrderItem) obj).getProduct();
-            store.decreaseProduct(product, ((OrderItem) obj).getQtt());
+            Product product = ((ProductHolder) obj).getProduct();
+            store.decreaseProduct(product, ((ProductHolder) obj).getQtt());
         }
         shoppingCart.cleanCart();
         return order;
@@ -49,9 +43,9 @@ public class OrderFinisher {
     private PaymentOption getPayment() {
         PaymentOption paymentOption;
         if (paymentOptionType.equals(PaymentOptionType.BILLET)) {
-            paymentOption = new PaymentBillet(shoppingCart.getCartTotal());
+            paymentOption = new PaymentBillet(shoppingCart.getShoppingCartTotal());
         } else {
-            paymentOption = new PaymentCreditCard(shoppingCart.getCartTotal(), timesToPay, cardNumber);
+            paymentOption = new PaymentCreditCard(shoppingCart.getShoppingCartTotal(), timesToPay, cardNumber);
         }
         return paymentOption;
     }

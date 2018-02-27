@@ -1,10 +1,12 @@
 A classe OrderItem pode ser substituido por ProductHolder
 
-ProductHolder           >> para Store e Order
+ProductHolder           >> para Order
 - Product product
 - int qtt
 # setQtt
 # getQtt
-        AdjustableProductHolder         >> para ShoppingCart
+        AdjustableProductHolder         >> para ShoppingCart, Store
             + increaseQtt
             + decreaseQtt
+
+
