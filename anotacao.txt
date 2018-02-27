@@ -1,11 +1,61 @@
-A classe OrderItem pode ser substituido por ProductHolder
 
-ProductHolder           >> para Order
-- Product product
+model.payment.PaymentOption
+BILLET, CREDIT_CARD
+
+model.payment.Payment
+    model.payment.PaymentCreditCard
+    model.payment.PaymentBillet
+
+model.payment.BarCode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A classe OrderItem pode ser substituido por model.product.ProductHolder
+
+model.product.ProductHolder           >> para model.client.Order
+- model.product.Product model.product
 - int qtt
 # setQtt
 # getQtt
-        AdjustableProductHolder         >> para ShoppingCart, Store
+        model.product.AdjustableProductHolder         >> para model.purchase.ShoppingCart, database.Store
             + increaseQtt
             + decreaseQtt
 
